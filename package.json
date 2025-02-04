@@ -1,0 +1,19 @@
+{
+  "name": "h1we010124-bilbasen-nodeseq",
+  "version": "1.0.0",
+  "description": "API i NodeJS, Express og Sequelize",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Webudvikler-TechCollege/H1WE010124-Bilbasen-NodeSeq.git"
+  },
+  "author": "Heinz K @ TechCollege",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Webudvikler-TechCollege/H1WE010124-Bilbasen-NodeSeq/issues"
+  },
+  "homepage": "https://github.com/Webudvikler-TechCollege/H1WE010124-Bilbasen-NodeSeq#readme"
+}
