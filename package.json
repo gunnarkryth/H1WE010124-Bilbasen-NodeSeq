@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "API i NodeJS, Express og Sequelize",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/Webudvikler-TechCollege/H1WE010124-Bilbasen-NodeSeq/issues"
   },
-  "homepage": "https://github.com/Webudvikler-TechCollege/H1WE010124-Bilbasen-NodeSeq#readme"
+  "homepage": "https://github.com/Webudvikler-TechCollege/H1WE010124-Bilbasen-NodeSeq#readme",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
 }
