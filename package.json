@@ -18,6 +18,9 @@
   },
   "homepage": "https://github.com/Webudvikler-TechCollege/H1WE010124-Bilbasen-NodeSeq#readme",
   "dependencies": {
-    "express": "^4.21.2"
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mysql2": "^3.12.0",
+    "sequelize": "^6.37.5"
   }
 }

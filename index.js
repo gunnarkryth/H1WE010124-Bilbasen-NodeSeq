@@ -1,7 +1,11 @@
 import express from 'express'
+import dotenv from 'dotenv'
+import sequelize from './config/sequelizeClient.js'
+
+dotenv.config()
 
 const app = express()
-const port = 4242
+const port = process.env.SERVERPORT || 4242
 
 app.get('/', (req,res) => {
     console.log('Hej verden')
