@@ -7,6 +7,7 @@ dotenv.config()
 
 const app = express()
 const port = process.env.SERVERPORT || 4242
+app.use(express.urlencoded({ extended: true }))
 
 // Route til root
 app.get('/', (req,res) => {
@@ -14,13 +15,15 @@ app.get('/', (req,res) => {
     res.send('Hello world')
 })
 
-app.use(dbController, carController)
+app.use(
+    dbController, 
+    carController
+)
 
 // Route til 404
 app.get('*', (req,res) => {
     res.send('Could not find file')
 })
-
 
 app.listen(port, () => {
     console.log(`Server runs at http://localhost:${port}`)
