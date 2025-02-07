@@ -1,6 +1,7 @@
 import express from 'express'
 import { carModel } from '../models/carModel.js'
 import { brandModel } from '../models/brandModel.js'
+import { Authorize } from '../utils/authUtils.js'
 
 export const carController = express.Router()
 
@@ -57,7 +58,7 @@ carController.get('/cars/:id([0-9]*)', async (req, res) => {
 })
 
 // Route to create (CREATE)
-carController.post('/cars', async (req, res) => {    
+carController.post('/cars', Authorize, async (req, res) => {    
     const { brand_id: brandId, model, year, price, color } = req.body;
 
     if (!brandId || !model || !year || !price || !color) {

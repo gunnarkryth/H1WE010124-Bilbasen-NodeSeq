@@ -4,6 +4,7 @@ import { dbController } from './controller/dbController.js'
 import { carController } from './controller/carController.js'
 import { brandController } from './controller/brandController.js'
 import { userController } from './controller/userController.js'
+import { authController } from './controller/authController.js'
 
 dotenv.config()
 
@@ -21,7 +22,8 @@ app.use(
     dbController, 
     carController,
     brandController,
-    userController
+    userController,
+    authController
 )
 
 // Route til 404
