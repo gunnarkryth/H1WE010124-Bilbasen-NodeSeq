@@ -2,6 +2,8 @@ import express from 'express'
 import dotenv from 'dotenv'
 import { dbController } from './controller/dbController.js'
 import { carController } from './controller/carController.js'
+import { brandController } from './controller/brandController.js'
+import { userController } from './controller/userController.js'
 
 dotenv.config()
 
@@ -17,7 +19,9 @@ app.get('/', (req,res) => {
 
 app.use(
     dbController, 
-    carController
+    carController,
+    brandController,
+    userController
 )
 
 // Route til 404

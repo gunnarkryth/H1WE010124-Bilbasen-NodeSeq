@@ -1,13 +1,25 @@
 import express from 'express'
 import { carModel } from '../models/carModel.js'
+import { brandModel } from '../models/brandModel.js'
 
 export const carController = express.Router()
+
+carModel.belongsTo(brandModel, {
+    foreignKey: {
+        allowNull: false
+    }
+})
+brandModel.hasMany(carModel)
 
 // Route to list (READ)
 carController.get('/cars', async (req, res) => {
     try {
         const data = await carModel.findAll({
-            attributes: ['id', 'brand', 'color']
+            attributes: ['id', 'color'],
+            include: {
+                model: brandModel,
+                attributes: ['name']
+            }
         })
 
         if (!data || data.length === 0) {
@@ -27,7 +39,10 @@ carController.get('/cars/:id([0-9]*)', async (req, res) => {
             where: {
                 id: id
             },
-            attributes: ['brand', 'color']
+            include: {
+                model: brandModel
+            }
+
         })
 
         if (!data) {
@@ -42,16 +57,16 @@ carController.get('/cars/:id([0-9]*)', async (req, res) => {
 })
 
 // Route to create (CREATE)
-carController.post('/cars', async (req, res) => {
-    const { brand, model, year, price, color } = req.body;
+carController.post('/cars', async (req, res) => {    
+    const { brand_id: brandId, model, year, price, color } = req.body;
 
-    if (!brand || !model || !year || !price || !color) {
+    if (!brandId || !model || !year || !price || !color) {
         return res.json({ message: 'Missing required data' })
     }
 
     try {
         const result = await carModel.create({
-            brand, model, year, price, color
+            brandId, model, year, price, color
         })
 
         res.status(201).json(result)
@@ -60,6 +75,7 @@ carController.post('/cars', async (req, res) => {
     }
 })
 
+// Route to update (UPDATE)
 carController.put('/cars', async (req, res) => {
     const { brand, model, year, price, color, id } = req.body;
 
@@ -81,9 +97,9 @@ carController.put('/cars', async (req, res) => {
     }
 })
 
+// Route to delete (DELETE)
 carController.delete('/cars/:id([0-9]*)', async (req, res) => {
     const { id } = req.params
-    
     if(id) {
         try {
             await carModel.destroy({
