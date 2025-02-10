@@ -1,28 +1,31 @@
-import sequelize from "../config/sequelizeClient.js"
-import { Model, DataTypes } from 'sequelize'
+import sequelize from "../config/sequelizeClient.js";
+import { Model, DataTypes } from "sequelize";
 
-export class brandModel extends Model{}
+export class brandModel extends Model {}
 
-brandModel.init({
+brandModel.init(
+  {
     id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        allowNull: false,
-        primaryKey: true
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      allowNull: false,
+      primaryKey: true,
     },
     name: {
-        type: DataTypes.STRING,
-        allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     logo_url: {
-        type: DataTypes.STRING,
-        allowNull: false
-    }
-},{
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  },
+  {
     sequelize,
-    modelName: 'brand',
+    modelName: "brand",
     underscored: true,
     freezeTableName: false,
     createdAt: true,
-    updatedAt: true
-})
+    updatedAt: true,
+  }
+);

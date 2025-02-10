@@ -1,56 +1,59 @@
 import sequelize from "../config/sequelizeClient.js";
-import { Model, DataTypes } from 'sequelize'
-import bcrypt from 'bcrypt'
+import { Model, DataTypes } from "sequelize";
+import bcrypt from "bcrypt";
 
-export class userModel extends Model{}
+export class userModel extends Model {}
 
-userModel.init({
+userModel.init(
+  {
     id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        allowNull: false,
-        primaryKey: true
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      allowNull: false,
+      primaryKey: true,
     },
     firstname: {
-        type: DataTypes.STRING,
-        allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     lastname: {
-        type: DataTypes.STRING,
-        allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     email: {
-        type: DataTypes.STRING,
-        allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     password: {
-        type: DataTypes.STRING,
-        allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     refresh_token: {
-        type: DataTypes.STRING,
-        allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     is_active: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false
-    }
-}, {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
+  },
+  {
     sequelize,
-    modelName: 'user',
+    modelName: "user",
     underscored: true,
     hooks: {
-        beforeCreate: async (userModel, options) => {
-            userModel.password = await createHash(userModel.password)
-        },
-        beforeUpdate: async (userModel, options) => {
-            userModel.password = await createHash(userModel.password)
-        }
-    }
-})
+      beforeCreate: async (userModel, options) => {
+        userModel.password = await createHash(userModel.password);
+      },
+      beforeUpdate: async (userModel, options) => {
+        userModel.password = await createHash(userModel.password);
+      },
+    },
+  }
+);
 
-const createHash = async string => {
-    const salt = await bcrypt.genSalt(10)
-    const hashed_string = await bcrypt.hash(string, salt)
-    return hashed_string
-}
+const createHash = async (string) => {
+  const salt = await bcrypt.genSalt(10);
+  const hashed_string = await bcrypt.hash(string, salt);
+  return hashed_string;
+};

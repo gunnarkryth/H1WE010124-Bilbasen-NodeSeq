@@ -1,14 +1,14 @@
-import jwt from "jsonwebtoken"
-import dotenv from "dotenv" // Credentials
-import bcrypt from "bcrypt"
-import { userModel } from "../models/userModel.js"
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv"; // Credentials
+import bcrypt from "bcrypt";
+import { userModel } from "../models/userModel.js";
 
-dotenv.config()
+dotenv.config();
 
 const Authenticate = async (req, res) => {
   console.log(req.body);
-    // Destructure Assignment af username og password fra request body
-  const { username, password } = req.body
+  // Destructure Assignment af username og password fra request body
+  const { username, password } = req.body;
 
   // Hvis brugernavn og password findes...
   if (username && password) {
@@ -16,11 +16,11 @@ const Authenticate = async (req, res) => {
     const user_result = await userModel.findOne({
       attributes: ["id", "firstname", "lastname", "password"],
       where: { email: username, is_active: 1 },
-    })
+    });
 
     if (!user_result) {
       // Returner forbidden hvis bruger ikke eksisterer
-      res.sendStatus(401)
+      res.sendStatus(401);
     } else {
       // Deklarerer user objekt af user values
       const data = {
@@ -28,7 +28,7 @@ const Authenticate = async (req, res) => {
         firstname: user_result.get("firstname"),
         lastname: user_result.get("lastname"),
         password: user_result.get("password"),
-      }
+      };
 
       // Validerer krypterede passwords
       bcrypt.compare(password, data.password, (err, result) => {
@@ -39,7 +39,7 @@ const Authenticate = async (req, res) => {
           // (plus foran konverterer til tal)
           const expRefreshDate =
             Math.floor(Date.now() / 1000) +
-            +process.env.TOKEN_REFRESH_EXPIRATION_SECS
+            +process.env.TOKEN_REFRESH_EXPIRATION_SECS;
 
           // Genererer refresh token ud fra udlÃ¸bstid, user_id og token_refresh_key
           const refresh_token = jwt.sign(
@@ -48,7 +48,7 @@ const Authenticate = async (req, res) => {
               data: { id: data.id },
             },
             process.env.TOKEN_REFRESH_KEY
-          )
+          );
 
           // Updater refresh token i bruger database
           userModel.update(
@@ -56,7 +56,7 @@ const Authenticate = async (req, res) => {
             {
               where: { id: data.id },
             }
-          )
+          );
 
           // ACCESS_TOKEN
 
@@ -64,7 +64,7 @@ const Authenticate = async (req, res) => {
           // (plus foran konverterer til tal)
           const expAccessDate =
             Math.floor(Date.now() / 1000) +
-            +process.env.TOKEN_ACCESS_EXPIRATION_SECS
+            +process.env.TOKEN_ACCESS_EXPIRATION_SECS;
 
           // Deklarerer payload var af user values
           const payload = {
@@ -72,7 +72,7 @@ const Authenticate = async (req, res) => {
             firstname: data.firstname,
             lastname: data.lastname,
             email: username,
-          }
+          };
 
           // Genererer access token
           const access_token = jwt.sign(
@@ -81,7 +81,7 @@ const Authenticate = async (req, res) => {
               data: payload,
             },
             process.env.TOKEN_ACCESS_KEY
-          )
+          );
 
           // Returnerer access_token til requester
           return res.json({
@@ -89,21 +89,21 @@ const Authenticate = async (req, res) => {
             user: {
               id: `${data.id}`,
               firstname: `${data.firstname}`,
-              lastname: `${data.lastname}`
+              lastname: `${data.lastname}`,
             },
             created: Date(),
-          })
+          });
         } else {
           // Returner 401 Unauthorized
-          return res.sendStatus(401)
+          return res.sendStatus(401);
         }
-      })
+      });
     }
   } else {
     // Returner 401 Forbidden
-    return res.sendStatus(403)
+    return res.sendStatus(403);
   }
-}
+};
 
 /**
  * Authorize User
@@ -114,13 +114,13 @@ const Authenticate = async (req, res) => {
  */
 const Authorize = async (req, res, next) => {
   // Henter access token fra auth header
-  const bearerHeader = req.headers["authorization"]  
-  let access_token;  
+  const bearerHeader = req.headers["authorization"];
+  let access_token;
 
-  if(bearerHeader && bearerHeader.includes('Bearer')) {
-    access_token = bearerHeader.substr(7) // Remove "Bearer "  
+  if (bearerHeader && bearerHeader.includes("Bearer")) {
+    access_token = bearerHeader.substr(7); // Remove "Bearer "
   } else {
-    res.status(401).send({ message: 'Token not accepted' })
+    res.status(401).send({ message: "Token not accepted" });
   }
 
   // BekrÃ¦fter access_token med access_key
@@ -133,9 +133,9 @@ const Authorize = async (req, res, next) => {
         case "invalid signature":
           // Returnerer statuskode (403: Forbidden)
           res.status(403).send({
-            message: err.message
-          })
-          break
+            message: err.message,
+          });
+          break;
         case "jwt expired":
           // Refresh token
           // Decoder auth token med access_key
@@ -144,118 +144,120 @@ const Authorize = async (req, res, next) => {
           const { id } = jwt.decode(
             access_token,
             process.env.TOKEN_ACCESS_KEY
-          ).data
+          ).data;
           // Henter db bruger ud fra id
-          userModel.findOne({
-            where: { id: id, is_active: 1 },
-          }).then(record => {
-            if (!record?.refresh_token) {
-              // Returnerer statuskode (400: Bad Request)
-              res.sendStatus(400)
-            } else {
-              // BekrÃ¦fter brugers refresh_token
-              jwt.verify(
-                record.refresh_token,
-                process.env.TOKEN_REFRESH_KEY,
-                (err, data) => {
-                  if (err) {
-                    switch (err.message) {
-                      case "jwt expired":
-                      case "jwt malformed":
-                        // Returerner besked om at refresh_token er udlÃ¸bet
-                        // Betyder at bruger skal logge ind igen
-                        res.status(400).send({ 
-                          message: "Refresh token malformed or expired. Please login again." 
-                        })
-                        break
-                      case "invalide token":
-                        // Returnerer statuskode (400: Bad Request)
-                        res.sendStatus(400)
-                        break
+          userModel
+            .findOne({
+              where: { id: id, is_active: 1 },
+            })
+            .then((record) => {
+              if (!record?.refresh_token) {
+                // Returnerer statuskode (400: Bad Request)
+                res.sendStatus(400);
+              } else {
+                // BekrÃ¦fter brugers refresh_token
+                jwt.verify(
+                  record.refresh_token,
+                  process.env.TOKEN_REFRESH_KEY,
+                  (err, data) => {
+                    if (err) {
+                      switch (err.message) {
+                        case "jwt expired":
+                        case "jwt malformed":
+                          // Returerner besked om at refresh_token er udlÃ¸bet
+                          // Betyder at bruger skal logge ind igen
+                          res.status(400).send({
+                            message:
+                              "Refresh token malformed or expired. Please login again.",
+                          });
+                          break;
+                        case "invalide token":
+                          // Returnerer statuskode (400: Bad Request)
+                          res.sendStatus(400);
+                          break;
+                      }
+                    } else {
+                      // Genererer ny access token
+
+                      // Deklarerer var med udlÃ¸bsdtid for access_token
+                      // (plus foran konverterer til tal)
+                      const expDate =
+                        Math.floor(Date.now() / 1000) +
+                        +process.env.TOKEN_ACCESS_EXPIRATION_SECS;
+
+                      // Deklarerer payload var ud fra brugers db data
+                      const payload = {
+                        id: id,
+                        firstname: record.firstname,
+                        lastname: record.lastname,
+                        email: record.email,
+                      };
+
+                      // Genererer token ud fra payload og access tid
+                      const access_token = jwt.sign(
+                        {
+                          exp: expDate,
+                          data: payload,
+                        },
+                        process.env.TOKEN_ACCESS_KEY
+                      );
+
+                      // Returnerer access_token til requester
+                      return res.json({
+                        access_token: access_token,
+                        updated: Date(),
+                      });
+                      next();
                     }
-                  } else {
-                    // Genererer ny access token
-
-                    // Deklarerer var med udlÃ¸bsdtid for access_token
-                    // (plus foran konverterer til tal)
-                    const expDate =
-                      Math.floor(Date.now() / 1000) +
-                      +process.env.TOKEN_ACCESS_EXPIRATION_SECS
-
-                    // Deklarerer payload var ud fra brugers db data
-                    const payload = {
-                      id: id,
-                      firstname: record.firstname,
-                      lastname: record.lastname,
-                      email: record.email,
-                    }
-
-                    // Genererer token ud fra payload og access tid
-                    const access_token = jwt.sign(
-                      {
-                        exp: expDate,
-                        data: payload,
-                      },
-                      process.env.TOKEN_ACCESS_KEY
-                    )
-
-                    // Returnerer access_token til requester
-                    return res.json({
-                      access_token: access_token,
-                      updated: Date(),
-                    })
-                    next()
                   }
-                }
-              )
-            }
-          })
-          break
+                );
+              }
+            });
+          break;
       }
     } else {
       // Sender bruger videre til nÃ¦ste trin i router
-      next()
+      next();
     }
-  })
-}
+  });
+};
 
 /**
  * Metode til at hente bruger id ud fra en token
- * @param {*} req 
- * @param {*} res 
- * @returns 
+ * @param {*} req
+ * @param {*} res
+ * @returns
  */
 const getUserFromToken = async (req, res) => {
   const bearerHeader = req.headers["authorization"];
 
-  if(bearerHeader && bearerHeader.includes('Bearer ')) {
-    const token = bearerHeader.split(' ')[1]
+  if (bearerHeader && bearerHeader.includes("Bearer ")) {
+    const token = bearerHeader.split(" ")[1];
     try {
-      const decodeToken = jwt.verify(token, process.env.TOKEN_ACCESS_KEY)
-      const user_id = await decodeToken.data.id
+      const decodeToken = jwt.verify(token, process.env.TOKEN_ACCESS_KEY);
+      const user_id = await decodeToken.data.id;
       console.log(user_id);
-      return user_id
-    } catch(err) {
-      console.error(err)
+      return user_id;
+    } catch (err) {
+      console.error(err);
     }
   }
-}
-
+};
 
 /**
  * Decode token - NOT IN USE
- * @param {*} token 
+ * @param {*} token
  */
 const decodeToken = async (token) => {
   jwt.verify(token, process.env.TOKEN_REFRESH_KEY, (err, decoded) => {
     if (err) {
-      console.error('JWT verification error:', err);
+      console.error("JWT verification error:", err);
       // Handle error, e.g., token is invalid or expired
     } else {
       const payload = decoded;
-      console.log('Decoded payload:', payload);
+      console.log("Decoded payload:", payload);
     }
-  });  
-}
+  });
+};
 
-export { Authenticate, Authorize, getUserFromToken }
+export { Authenticate, Authorize, getUserFromToken };

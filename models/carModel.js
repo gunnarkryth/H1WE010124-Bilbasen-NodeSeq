@@ -1,37 +1,40 @@
-import sequelize from "../config/sequelizeClient.js"
-import { Model, DataTypes } from 'sequelize'
+import sequelize from "../config/sequelizeClient.js";
+import { Model, DataTypes } from "sequelize";
 
-export class carModel extends Model{}
+export class carModel extends Model {}
 
-carModel.init({
+carModel.init(
+  {
     id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        allowNull: false,
-        primaryKey: true
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      allowNull: false,
+      primaryKey: true,
     },
     model: {
-        type: DataTypes.STRING,
-        allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     year: {
-        type: DataTypes.DATE,
-        allowNull: false
+      type: DataTypes.DATE,
+      allowNull: false,
     },
     color: {
-        type: DataTypes.STRING,
-        allowNull: true
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     price: {
-        type: DataTypes.DOUBLE,
-        allowNull: true,
-        defaultValue: 0.00
-    }
-},{
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+      defaultValue: 0.0,
+    },
+  },
+  {
     sequelize,
-    modelName: 'car',
+    modelName: "car",
     underscored: true,
     freezeTableName: false,
     createdAt: true,
-    updatedAt: true
-})
+    updatedAt: true,
+  }
+);
